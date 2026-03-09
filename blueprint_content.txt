@@ -1,0 +1,1361 @@
+LocalWeb AI
+Automated AI Agent Platform for Local Business Websites
+Full Project Blueprint  •  Agent Architecture  •  Code Guide  •  Revenue Model
+
+1. Project Vision & Executive Summary
+
+LocalWeb AI is a fully automated, multi-agent SaaS platform that identifies local businesses without an online presence, autonomously reaches out to them via AI voice calls and WhatsApp, demonstrates a ready-made sample website tailored to their business, and closes the deal — all without human intervention. Once a business agrees and pays, the site is instantly deployed and made publicly accessible.
+
+1.1 Core Problem Being Solved
+Millions of small and local businesses — general stores, restaurants, salons, clinics, repair shops — operate without any web presence. They lose customers daily to competitors who are discoverable online. Traditionally, getting a website requires hiring developers, navigating complex tools, or paying agencies thousands of dollars. Most small businesses simply never do it.
+
+1.2 The LocalWeb AI Solution
+
+1.3 Revenue Potential
+
+Estimated MRR at 500 clients on Starter plan: $24,500–$49,500/month. At 2,000 clients with upsells, MRR exceeds $300,000.
+
+2. System Architecture — Multi-Agent Design
+
+The platform is built around a modular team of specialized AI agents, each owning a distinct stage of the pipeline. They communicate via a central message queue (Redis Streams / Kafka) and share state in a PostgreSQL + Redis database cluster.
+
+2.1 Agent Team Overview
+
+2.2 Pipeline Flow Diagram (Textual)
+
+3. Technology Stack
+
+3.1 Backend & Infrastructure
+
+3.2 Frontend & Dashboard
+
+3.3 External APIs & Integrations
+
+4. Agent Implementation — Full Code Guide
+
+Each agent is implemented as a Python class that inherits from a BaseAgent. Agents communicate via Redis Streams and share state via PostgreSQL. Below is the complete implementation architecture.
+
+4.1 Project File Structure
+
+4.2 Base Agent Class
+
+4.3 Discovery Agent — Find Local Businesses
+
+4.4 Verification Agent — Does Website Exist?
+
+4.5 Sample Builder Agent — AI-Generated Preview Website
+
+4.6 Calling Agent — AI Voice Outreach
+
+4.7 WhatsApp Agent — Personalized Pitch
+
+4.8 Negotiation Agent — Objection Handling
+
+4.9 Payment Agent — Stripe Integration
+
+4.10 Builder Agent — Production Website Deploy
+
+4.11 QA Agent — Automated Testing & Approval
+
+5. Database Schema
+
+5.1 Core Tables
+
+5.2 Lead Status State Machine
+
+6. AI Prompts — Complete Library
+
+These prompts are used across different agents. They should be stored in a prompts/ directory and versioned. Use LangSmith for prompt tracking and evaluation.
+
+6.1 Discovery Prompt — Category Expansion
+
+6.2 Sample Builder Prompt — Website Content
+
+6.3 Voice Call Script Prompt
+
+6.4 Negotiation / Objection Handling Prompt
+
+6.5 QA Review Prompt
+
+7. API Endpoints Reference
+
+
+8. Revenue & Business Model Strategy
+
+8.1 Pricing Tiers
+
+8.2 Upsell & Expansion Revenue
+Local SEO package — $79/month: AI manages Google My Business, schema markup, citation building
+Google Ads management — $99-$199/month: AI creates and optimizes PPC campaigns for the business
+Social media content — $49/month: Weekly AI-generated posts for Facebook/Instagram
+WhatsApp Business automation — $39/month: AI chatbot for the business's own customer queries
+Annual pre-pay discount — 2 months free: Reduces churn and improves cash flow
+Referral program — 20% commission: Business owners refer other local businesses
+
+8.3 Unit Economics
+
+9. Deployment & DevOps Guide
+
+9.1 Local Development Setup
+
+9.2 Production Kubernetes Deployment
+EKS (AWS) or GKE (GCP) cluster with auto-scaling node groups
+Separate deployments for: API server, Orchestrator, each Agent worker pool
+PostgreSQL via RDS (Multi-AZ), Redis via ElastiCache, Kafka via MSK
+Ingress: AWS ALB + Route53 + ACM for SSL certificates
+Secrets management: AWS Secrets Manager or HashiCorp Vault
+CI/CD: GitHub Actions → ECR → ArgoCD GitOps deployment
+Monitoring: Datadog APM + custom agent metrics dashboard
+Alerts: PagerDuty integration for pipeline failure notifications
+
+10. Build Prompts for AI-Assisted Development
+
+Use the following prompts to have AI agents write, review, and approve code for this project. Recommended workflow: Claude writes code → Claude reviews → GPT-4o does security audit → human approves PR.
+
+10.1 Master Build Prompt — Full Application
+
+10.2 Agent-Specific Build Prompts
+
+
+10.3 AI Code Review Prompt
+
+11. Compliance, Legal & Ethics
+
+11.1 Calling & Messaging Compliance
+TCPA (USA): Only call during 8am–9pm local time. Maintain a Do-Not-Call list. Get consent before automated calls.
+GDPR (EU): Lawful basis for processing business contact data. Provide opt-out mechanism. Delete data on request.
+WhatsApp Policy: Only use approved message templates for first contact. Never spam. Respect opt-outs immediately.
+CAN-SPAM: All email outreach must have valid sender info and one-click unsubscribe.
+FTC Telemarketing Rules: AI calls must disclose they are automated within the first few seconds.
+
+11.2 Technical Safeguards
+Rate limiting: Max 50 discovery calls/day, max 200 WhatsApp messages/hour per sending number
+Do-Not-Contact list: Redis set of opted-out phone numbers — checked before every outreach
+Call time gating: Agent checks local time zone before placing any call
+Human escalation: Any call that goes beyond standard script escalates to human review queue
+Data encryption: All PII encrypted at rest (AES-256) and in transit (TLS 1.3)
+
+12. Phase Roadmap
+
+
+
+LocalWeb AI — Built to Scale. Automated End-to-End.
+v1.0 Blueprint  •  All rights reserved
+13. Server-Side Management Guide
+
+This section is the operational handbook for the server-side / DevOps team. It covers every management task — from first-time project initialization and API key setup, to ongoing monitoring, secrets rotation, database administration, agent control, and emergency rollback procedures. All commands assume the project root is active and the Python virtual environment is loaded.
+
+13.1 First-Time Deployment CLI Wizard
+Run the interactive setup wizard once on a fresh server. It validates all prerequisites, collects every API key and credential, writes a .env file, initialises the database, seeds default data, and performs a smoke test before handing off to the running stack. Never hard-code secrets — the wizard stores them in Vault / Secrets Manager automatically.
+
+13.2 API Key Configuration CLI
+Use the key-manager CLI to add, rotate, validate, or remove any API key without touching .env files manually. All values are encrypted at rest and injected at runtime as environment variables. Supports AWS Secrets Manager, HashiCorp Vault, and a local encrypted .env.vault file for development.
+
+13.3 Required API Keys Reference
+All keys below must be configured before the platform can run in production. The wizard will prompt for each one in order.
+
+13.4 Service Health & Status CLI
+Use the health CLI to check the status of every microservice, agent worker, and external API integration at any time. Returns a colour-coded table with latency, error rate, and last-seen timestamps.
+
+13.5 Database Management CLI
+All database administration tasks — migrations, backups, restores, data audits, purges, and index maintenance — are performed through the db-manager CLI. Never run raw SQL against production without first taking a snapshot via this tool.
+
+13.6 Agent Control CLI
+Start, stop, pause, scale, and configure individual AI agents at runtime without restarting the entire stack. This is the primary tool for traffic shaping and incident response.
+
+13.7 Log Management CLI
+All agent activity, API call logs, errors, and pipeline events are written to structured JSON logs and streamed to the central log aggregator (Datadog / ELK). The log CLI provides fast local tailing, filtering, and export without leaving the server.
+
+13.8 Do-Not-Contact (DNC) List Management
+The DNC list is a Redis set of opted-out phone numbers checked by every outreach agent before making contact. It is also persisted in PostgreSQL for auditability. Compliance law in many jurisdictions (TCPA, GDPR) requires that opt-outs are honoured immediately and permanently.
+
+13.9 Secrets Rotation & Security Maintenance
+Rotate API keys and credentials on a schedule (recommended: every 90 days) or immediately after a suspected security incident. The rotation CLI updates Vault / Secrets Manager, redeploys affected services, and logs the rotation event for the audit trail.
+
+13.10 Environment & Feature Flag Management
+The env-config CLI manages non-secret runtime configuration: feature flags, calling windows, rate limits, outreach cooldown periods, and pipeline behaviour toggles. Changes take effect in under 10 seconds without a service restart via Redis-backed config hot-reload.
+
+13.11 Admin User & Access Management
+Create, modify, and revoke admin dashboard accounts. Supports role-based access control (RBAC) with three built-in roles: super_admin (full access), ops_manager (manage agents, view all data), and viewer (read-only dashboard access).
+
+13.12 Deployment, Updates & Rollback
+Use the deploy CLI to push new versions, perform rolling updates with zero downtime, and roll back instantly if something goes wrong. All deployments are recorded with git SHA, timestamp, and deployer identity for the audit trail.
+
+13.13 System Diagnostics & Performance Profiling
+The diagnostics CLI collects a point-in-time snapshot of the entire system state: CPU/memory, queue depths, slow queries, error rates, and API latency. Run it first whenever investigating an incident.
+
+13.14 Stripe & Billing Management CLI
+Manage Stripe products, prices, subscriptions, and webhooks from the command line. Useful for seeding plans on a new server, adjusting pricing without touching the Stripe dashboard, and reconciling payment records against the local database.
+
+13.15 Client Site & Domain Management CLI
+Manage deployed client sites, custom domains, and Vercel/Cloudflare configurations. Use when a client site has a deployment issue, needs a domain change, or requires a manual redeploy.
+
+13.16 Server-Side Quick Reference Cheatsheet
+Common operations at a glance for the on-call engineer. All commands assume the project root directory and an activated Python virtual environment.
+
+All CLI scripts live under scripts/cli/ in the project root and share a common config loader and Vault client. Run any command with --help to see all available options. Script source code is fully documented with inline comments and can be extended by the server team as new management needs arise.
+Discover	Outreach	Close	Deploy	
+Find businesses without websites	Call or WhatsApp automatically	Show sample site, collect payment	Go live in 24 hours	
+---TABLE END---
+What Makes This Different	
+AI autonomously finds unrepresented businesses — no human prospecting needed	
+AI calls and WhatsApp agents pitch the business owner in their own language	
+A personalized sample website is generated BEFORE the pitch even begins	
+Payment is collected automatically — the website goes live within 24 hours	
+Zero human sales team required at scale — pure AI-to-close pipeline	
+---TABLE END---
+Revenue Stream	Description & Pricing	
+Starter Website Plan	$49–$99/month recurring per business	
+Premium Website Plan	$149–$299/month with SEO, booking, ecommerce	
+Setup / Onboarding Fee	$99–$249 one-time charge at signup	
+Domain & Hosting Markup	$15–$30/year margin on domain reselling	
+WhatsApp Business API	Charge for continued messaging as an add-on	
+Local SEO Package	$79/month upsell for Google ranking service	
+Google Ads Management	$99–$199/month AI-managed ad campaigns	
+Multi-location Packages	Volume deals with franchises and chains	
+---TABLE END---
+Agent Name	Role	Key Tools / APIs	
+Orchestrator Agent	Master controller — schedules tasks, monitors pipeline	LangGraph, Celery, Redis	
+Discovery Agent	Finds local businesses by area & category	Google Places API, SerpAPI, Yelp API	
+Verification Agent	Checks if a website already exists	DNS lookup, HTTP probe, Similarweb API	
+Sample Builder Agent	Generates a custom website preview	GPT-4o + custom templates + screenshots	
+Calling Agent	Makes AI voice outreach calls	Twilio Voice + ElevenLabs TTS + Whisper STR	
+WhatsApp Agent	Sends personalized WhatsApp pitches	WhatsApp Business Cloud API + templates	
+Negotiation Agent	Handles Q&A and objections during outreach	LLM with RAG on FAQ knowledge base	
+Payment Agent	Generates invoice and handles payment link	Stripe API + automated invoice email	
+Builder Agent	Builds the final production website	Next.js templates + CMS + Vercel deploy	
+QA Agent	Reviews code and site before going live	Playwright E2E + Lighthouse + LLM review	
+SEO Agent	Sets up Google Search Console + sitemap	GSC API + sitemap generator + schema.org	
+CRM Agent	Manages all contact data and follow-ups	HubSpot/Airtable API + email sequences	
+---TABLE END---
+End-to-End Automated Pipeline	
+STEP 1 [Discovery Agent]  →  Scrapes Google Maps / Yelp / SerpAPI for businesses by area & category	
+STEP 2 [Verification Agent]  →  For each business: DNS check + HTTP probe + Google search — does website exist?	
+STEP 3 [Sample Builder Agent]  →  Generates personalized sample site using business name, type, location, branding	
+STEP 4 [Calling Agent]  →  Places outbound AI voice call to owner — presents the value proposition	
+STEP 5 [WhatsApp Agent]  →  Sends WhatsApp message with sample website link, pricing, CTA button	
+STEP 6 [Negotiation Agent]  →  Responds to replies, answers questions, overcomes objections in real-time	
+STEP 7 [Payment Agent]  →  Sends Stripe payment link — monitors for successful payment confirmation	
+STEP 8 [Builder Agent]  →  On payment: builds production site, assigns domain, deploys to cloud	
+STEP 9 [QA Agent]  →  Automated E2E tests, performance audit, LLM review of content quality	
+STEP 10 [SEO Agent]  →  Submits sitemap, sets up Google Search Console, adds schema markup	
+STEP 11 [CRM Agent]  →  Sends welcome email, schedules 30-day check-in, flags for upsell sequence	
+---TABLE END---
+Layer	Technology Choices	
+Primary Language	Python 3.12 (FastAPI for REST, async-first)	
+Agent Framework	LangGraph (stateful agents) + LangChain (tools/chains)	
+Task Queue	Celery + Redis (background jobs) / Kafka for event streaming	
+Database	PostgreSQL (main store) + Redis (cache/session) + Pinecone (vector DB for RAG)	
+AI Models	GPT-4o (reasoning), Claude 3.5 Sonnet (code/QA), Whisper (STT), ElevenLabs (TTS)	
+Auth & Users	Supabase Auth (OAuth + email/password) + JWT	
+File Storage	AWS S3 / Cloudflare R2 for site assets, screenshots, media	
+Container	Docker + Docker Compose (local) → Kubernetes (production)	
+Cloud Provider	AWS (primary) or GCP — EKS for orchestration, RDS for Postgres	
+---TABLE END---
+Component	Technology	
+Admin Dashboard	Next.js 14 (App Router) + Tailwind CSS + shadcn/ui	
+Client Portal	Next.js — business owners log in to see their site stats	
+Website Templates	Next.js + Tailwind — 20+ industry-specific templates	
+Realtime Updates	Pusher / Supabase Realtime for live pipeline status	
+Charts & Analytics	Recharts + Google Analytics 4 integration	
+---TABLE END---
+Service	Purpose	
+Google Places API	Discover local businesses by category and location	
+SerpAPI / Bright Data	Scrape Google Maps search results at scale	
+Twilio Voice	Outbound AI phone calls to business owners	
+ElevenLabs	Ultra-realistic TTS for voice calling agent	
+OpenAI Whisper	Speech-to-text for real-time call transcription	
+WhatsApp Business Cloud API (Meta)	Send template + interactive messages to owners	
+Stripe	Payment processing, subscriptions, invoicing	
+Vercel / Netlify API	Programmatic site deployment with custom domains	
+Cloudflare API	DNS management for custom domain assignment	
+SendGrid / Resend	Transactional and marketing emails	
+HubSpot / Airtable	CRM for pipeline tracking and follow-up sequences	
+Google Search Console API	Auto-submit sitemaps, track indexing status	
+Lighthouse CI	Automated performance and SEO scoring	
+Playwright	E2E browser testing of deployed sites	
+---TABLE END---
+Directory Layout	
+localweb-ai/	
+  ├── agents/	
+  │   ├── base_agent.py          # Base class all agents inherit	
+  │   ├── orchestrator.py        # Master controller & scheduler	
+  │   ├── discovery_agent.py     # Google Maps / Yelp scraping	
+  │   ├── verification_agent.py  # Website existence check	
+  │   ├── sample_builder.py      # AI website preview generator	
+  │   ├── calling_agent.py       # Twilio + ElevenLabs voice calls	
+  │   ├── whatsapp_agent.py      # Meta WhatsApp Business API	
+  │   ├── negotiation_agent.py   # LLM Q&A + objection handling	
+  │   ├── payment_agent.py       # Stripe payment links & webhooks	
+  │   ├── builder_agent.py       # Next.js site build & deploy	
+  │   ├── qa_agent.py            # Playwright + Lighthouse testing	
+  │   ├── seo_agent.py           # Sitemap + GSC submission	
+  │   └── crm_agent.py           # CRM updates + email sequences	
+  ├── api/	
+  │   ├── main.py                # FastAPI entry point	
+  │   ├── routes/                # REST API route handlers	
+  │   └── webhooks/              # Twilio, Stripe, WhatsApp webhooks	
+  ├── templates/	
+  │   ├── restaurant/            # Restaurant website template	
+  │   ├── general_store/         # General store template	
+  │   ├── salon/                 # Salon/spa template	
+  │   └── [20+ more categories]	
+  ├── dashboard/                 # Next.js admin dashboard	
+  ├── client_portal/             # Next.js client-facing portal	
+  ├── workers/                   # Celery worker configs	
+  ├── db/	
+  │   ├── models.py              # SQLAlchemy ORM models	
+  │   └── migrations/            # Alembic DB migrations	
+  ├── config.py                  # Environment & settings	
+  ├── docker-compose.yml         # Local dev stack	
+  └── k8s/                       # Kubernetes manifests	
+---TABLE END---
+agents/base_agent.py	
+import asyncio, redis.asyncio as redis, json, logging	
+from abc import ABC, abstractmethod	
+from sqlalchemy.ext.asyncio import AsyncSession	
+from db.models import BusinessLead, PipelineEvent	
+	
+class BaseAgent(ABC):	
+    def __init__(self, redis_client, db_session):	
+        self.redis = redis_client	
+        self.db = db_session	
+        self.logger = logging.getLogger(self.__class__.__name__)	
+	
+    @abstractmethod	
+    async def process(self, lead_id: str, payload: dict) -> dict:	
+        pass	
+	
+    async def emit_event(self, stream: str, lead_id: str, data: dict):	
+        await self.redis.xadd(stream, {'lead_id': lead_id, 'data': json.dumps(data)})	
+	
+    async def update_lead_status(self, lead_id: str, status: str, notes: str = ''):	
+        # Updates PostgreSQL business_leads table	
+        async with self.db() as session:	
+            lead = await session.get(BusinessLead, lead_id)	
+            lead.status = status; lead.notes = notes	
+            await session.commit()	
+---TABLE END---
+agents/discovery_agent.py — Core Logic	
+class DiscoveryAgent(BaseAgent):	
+    async def process(self, area: str, category: str) -> list[dict]:	
+        # 1. Query Google Places API	
+        url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'	
+        params = {'query': f'{category} in {area}', 'key': GOOGLE_API_KEY}	
+        response = await httpx.get(url, params=params)	
+        places = response.json()['results']	
+	
+        # 2. Enrich with phone, address, category, place_id	
+        leads = []	
+        for place in places:	
+            lead = {	
+                'name': place['name'],	
+                'phone': place.get('formatted_phone_number'),	
+                'address': place.get('formatted_address'),	
+                'category': category,	
+                'place_id': place['place_id'],	
+                'lat': place['geometry']['location']['lat'],	
+                'lng': place['geometry']['location']['lng'],	
+            }	
+            leads.append(lead)	
+            await self.save_lead(lead)  # Save to PostgreSQL	
+	
+        # 3. Emit to verification stream	
+        for lead in leads:	
+            await self.emit_event('stream:verify', lead['id'], lead)	
+        return leads	
+---TABLE END---
+agents/verification_agent.py — Core Logic	
+import socket, httpx	
+class VerificationAgent(BaseAgent):	
+    async def process(self, lead_id: str, payload: dict) -> dict:	
+        name = payload['name']	
+        # 1. DNS check — try common domain patterns	
+        domains_to_try = [	
+            f"{name.lower().replace(' ','-')}.com",	
+            f"{name.lower().replace(' ','')}.com",	
+            f"{name.lower().replace(' ','')}online.com",	
+        ]	
+        for domain in domains_to_try:	
+            try:	
+                socket.gethostbyname(domain)	
+                r = await httpx.get(f'https://{domain}', timeout=5)	
+                if r.status_code < 400:	
+                    await self.update_lead_status(lead_id, 'HAS_WEBSITE')	
+                    return {'has_website': True, 'url': f'https://{domain}'}	
+            except: pass	
+        # 2. Google search for business name + location	
+        search = await serpapi_search(f'{name} {payload["address"]} official site')	
+        if search['organic_results'] and 'site:' in search['organic_results'][0]['link']:	
+            await self.update_lead_status(lead_id, 'HAS_WEBSITE')	
+            return {'has_website': True}	
+        # 3. No website found — proceed to sample builder	
+        await self.update_lead_status(lead_id, 'NO_WEBSITE')	
+        await self.emit_event('stream:sample_build', lead_id, payload)	
+        return {'has_website': False}	
+---TABLE END---
+agents/sample_builder.py — Core Logic	
+class SampleBuilderAgent(BaseAgent):	
+    async def process(self, lead_id: str, payload: dict) -> dict:	
+        category = payload['category']  # e.g. 'restaurant'	
+        template = load_template(category)  # Load Next.js template	
+	
+        # 1. Use GPT-4o to generate website content	
+        prompt = f'''	
+        Generate website content for a {category} called '{payload['name']}'	
+        located at {payload['address']}.	
+        Return JSON: {{headline, tagline, about, services[], cta_text, color_scheme}}	
+        '''	
+        content = await openai.chat(prompt)  # Returns structured JSON	
+	
+        # 2. Inject content into template HTML/React	
+        site_html = template.render(**content)	
+	
+        # 3. Deploy to preview subdomain (e.g. preview-abc123.localweb.ai)	
+        subdomain = f'preview-{lead_id[:8]}'	
+        url = await vercel_deploy(site_html, subdomain)	
+	
+        # 4. Take a screenshot for WhatsApp/email preview	
+        screenshot = await playwright_screenshot(url)	
+        screenshot_url = await upload_to_s3(screenshot)	
+	
+        await self.emit_event('stream:outreach', lead_id,	
+            {**payload, 'preview_url': url, 'screenshot_url': screenshot_url})	
+        return {'preview_url': url, 'screenshot_url': screenshot_url}	
+---TABLE END---
+agents/calling_agent.py — Twilio + ElevenLabs	
+class CallingAgent(BaseAgent):	
+    async def initiate_call(self, lead_id: str, payload: dict):	
+        # 1. Generate personalized script with LLM	
+        script = await llm.generate(f'''	
+        Write a friendly 60-second phone pitch for a {payload['category']}	
+        owner named [Owner]. Their business: {payload['name']}.	
+        Mention we built them a free website preview at {payload['preview_url']}.	
+        Keep it conversational, not salesy. End with asking if they can check WhatsApp.''')	
+	
+        # 2. Convert script to voice with ElevenLabs	
+        audio_url = await elevenlabs.tts(script, voice_id='friendly_male_en')	
+	
+        # 3. Place call via Twilio with TwiML	
+        twiml = f'<Response><Play>{audio_url}</Play><Record maxLength="120"/></Response>'	
+        call = await twilio.calls.create(	
+            to=payload['phone'],	
+            from_=TWILIO_NUMBER,	
+            twiml=twiml,	
+            status_callback=f'{API_BASE}/webhooks/twilio/call-status'	
+        )	
+	
+        # 4. Save call SID and wait for webhook callback	
+        await self.update_lead_status(lead_id, 'CALL_INITIATED')	
+        return {'call_sid': call.sid}	
+	
+    async def handle_call_response(self, call_sid: str, recording_url: str):	
+        # Transcribe owner's response with Whisper	
+        transcript = await whisper.transcribe(recording_url)	
+        # Send to Negotiation Agent for processing	
+        await self.emit_event('stream:negotiate', call_sid, {'transcript': transcript})	
+---TABLE END---
+agents/whatsapp_agent.py — Meta Cloud API	
+class WhatsAppAgent(BaseAgent):	
+    async def send_pitch(self, lead_id: str, payload: dict):	
+        phone = payload['phone']  # Must be in E.164 format: +1234567890	
+        preview_url = payload['preview_url']	
+        screenshot_url = payload['screenshot_url']	
+	
+        # 1. Send image message (screenshot of their sample site)	
+        await meta_api.send_image(	
+            to=phone,	
+            image_url=screenshot_url,	
+            caption=f'Hi! We built a FREE sample website for {payload["name"]}.'	
+                    f'Check it out: {preview_url}\n\nInterested? Reply YES!'	
+        )	
+	
+        # 2. Send interactive button message	
+        await meta_api.send_interactive(	
+            to=phone,	
+            body='We can get your business online in 24 hours starting at just $49/month.',	
+            buttons=[	
+                {'id': 'interested', 'title': 'Yes, I\'m Interested!'},	
+                {'id': 'pricing',    'title': 'See Pricing'},	
+                {'id': 'not_now',    'title': 'Not Right Now'},	
+            ]	
+        )	
+        await self.update_lead_status(lead_id, 'WHATSAPP_SENT')	
+	
+    async def handle_reply(self, phone: str, message: str, button_id: str = None):	
+        lead = await self.get_lead_by_phone(phone)	
+        if button_id == 'interested' or 'yes' in message.lower():	
+            await self.emit_event('stream:payment', lead.id, lead.payload)	
+        else:	
+            # Route to Negotiation Agent for AI response	
+            await self.emit_event('stream:negotiate', lead.id,	
+                {'message': message, 'channel': 'whatsapp'})	
+---TABLE END---
+agents/negotiation_agent.py — LLM + RAG	
+class NegotiationAgent(BaseAgent):	
+    def __init__(self, *args):	
+        super().__init__(*args)	
+        self.vectorstore = PineconeVectorStore(index='faq-kb')  # FAQ knowledge base	
+	
+    async def process(self, lead_id: str, payload: dict) -> dict:	
+        message = payload['message']	
+        channel = payload.get('channel', 'whatsapp')  # 'whatsapp' or 'call'	
+	
+        # 1. Retrieve relevant FAQ answers from vector store (RAG)	
+        relevant_docs = await self.vectorstore.similarity_search(message, k=3)	
+        context = '\n'.join([doc.page_content for doc in relevant_docs])	
+	
+        # 2. Generate personalized response	
+        response = await llm.chat([	
+            SystemMessage('You are a friendly sales assistant for LocalWeb AI...'	
+                         f'Context from FAQ:\n{context}'),	
+            HumanMessage(message)	
+        ])	
+	
+        # 3. Send response back via appropriate channel	
+        lead = await self.get_lead(lead_id)	
+        if channel == 'whatsapp':	
+            await meta_api.send_text(to=lead.phone, body=response.content)	
+        # 4. Check if lead is ready to pay after response	
+        intent = await classify_intent(message)  # 'ready'/'objection'/'not_interested'	
+        if intent == 'ready':	
+            await self.emit_event('stream:payment', lead_id, lead.payload)	
+        return {'response': response.content, 'intent': intent}	
+---TABLE END---
+agents/payment_agent.py — Stripe	
+import stripe	
+class PaymentAgent(BaseAgent):	
+    async def create_payment_link(self, lead_id: str, payload: dict) -> str:	
+        # 1. Create Stripe customer	
+        customer = await stripe.Customer.create(	
+            name=payload['name'],	
+            phone=payload['phone'],	
+            metadata={'lead_id': lead_id}	
+        )	
+        # 2. Create subscription + one-time setup fee	
+        session = await stripe.checkout.Session.create(	
+            customer=customer.id,	
+            payment_method_types=['card'],	
+            line_items=[	
+                {'price': 'price_starter_monthly', 'quantity': 1},  # $49/mo	
+                {'price': 'price_setup_fee',       'quantity': 1},  # $99 one-time	
+            ],	
+            mode='subscription',	
+            success_url=f'{BASE_URL}/success?session_id={{CHECKOUT_SESSION_ID}}',	
+            cancel_url=f'{BASE_URL}/cancel',	
+        )	
+        # 3. Send payment link via WhatsApp	
+        await meta_api.send_text(	
+            to=payload['phone'],	
+            body=f'Great! Here is your secure payment link:\n{session.url}\n'	
+                 f'After payment, your website goes live within 24 hours!'	
+        )	
+        await self.update_lead_status(lead_id, 'PAYMENT_LINK_SENT')	
+        return session.url	
+	
+    async def handle_payment_success(self, session_id: str):	
+        # Called by Stripe webhook on successful payment	
+        lead = await self.get_lead_by_stripe_session(session_id)	
+        await self.update_lead_status(lead.id, 'PAID')	
+        await self.emit_event('stream:build', lead.id, lead.payload)	
+---TABLE END---
+agents/builder_agent.py — Next.js + Vercel	
+class BuilderAgent(BaseAgent):	
+    async def process(self, lead_id: str, payload: dict) -> dict:	
+        category = payload['category']	
+        # 1. Clone template repository for the business category	
+        repo_path = f'/tmp/build-{lead_id}'	
+        shutil.copytree(f'templates/{category}', repo_path)	
+	
+        # 2. Inject AI-generated content into template files	
+        content = await self.generate_full_content(payload)	
+        await self.inject_content(repo_path, content)	
+	
+        # 3. Register custom domain via Cloudflare API	
+        domain = f"{payload['slug']}.com"  # e.g. joes-pizza.com	
+        await cloudflare.create_dns_record(domain)	
+	
+        # 4. Deploy to Vercel with custom domain	
+        project = await vercel.create_project(	
+            name=payload['slug'],	
+            framework='nextjs',	
+            repo_path=repo_path	
+        )	
+        await vercel.add_domain(project.id, domain)	
+        deployment = await vercel.deploy(project.id)	
+	
+        # 5. Wait for deployment to go live, then notify QA Agent	
+        await deployment.wait_ready()	
+        await self.emit_event('stream:qa', lead_id,	
+            {**payload, 'live_url': f'https://{domain}'})	
+        return {'live_url': f'https://{domain}', 'project_id': project.id}	
+---TABLE END---
+agents/qa_agent.py — Playwright + Lighthouse + LLM	
+class QAAgent(BaseAgent):	
+    async def process(self, lead_id: str, payload: dict) -> dict:	
+        url = payload['live_url']	
+        results = {}	
+	
+        # 1. Playwright end-to-end checks	
+        async with async_playwright() as p:	
+            browser = await p.chromium.launch()	
+            page = await browser.new_page()	
+            await page.goto(url)	
+            results['title'] = await page.title()	
+            results['links_ok'] = await self.check_all_links(page)	
+            results['mobile_ok'] = await self.check_mobile_viewport(page)	
+            await browser.close()	
+	
+        # 2. Lighthouse performance + SEO audit	
+        lighthouse = await run_lighthouse(url)	
+        results['performance'] = lighthouse['categories']['performance']['score']	
+        results['seo_score'] = lighthouse['categories']['seo']['score']	
+        results['accessibility'] = lighthouse['categories']['accessibility']['score']	
+	
+        # 3. LLM content quality review	
+        page_html = await fetch_html(url)	
+        review = await llm.chat(f'Review this website HTML for quality, professionalism,	
+            and accuracy. Score 1-10 and flag any issues.\n{page_html[:3000]}')	
+        results['llm_score'] = extract_score(review)	
+        results['llm_feedback'] = review	
+	
+        # 4. Auto-approve if scores meet threshold, else flag for fix	
+        if all([results['performance'] > 0.8, results['seo_score'] > 0.8,	
+                results['llm_score'] >= 8]):	
+            await self.emit_event('stream:seo', lead_id, {**payload, 'qa': results})	
+            await self.update_lead_status(lead_id, 'QA_PASSED')	
+        else:	
+            await self.emit_event('stream:build_fix', lead_id, {**payload, 'qa': results})	
+        return results	
+---TABLE END---
+db/models.py — SQLAlchemy ORM	
+class BusinessLead(Base):	
+    __tablename__ = 'business_leads'	
+    id          = Column(UUID, primary_key=True, default=uuid4)	
+    name        = Column(String, nullable=False)	
+    phone       = Column(String)             # E.164 format	
+    email       = Column(String)	
+    address     = Column(String)	
+    category    = Column(String)             # restaurant, salon, etc.	
+    area        = Column(String)             # city/district	
+    place_id    = Column(String)             # Google Places ID	
+    has_website = Column(Boolean, default=False)	
+    status      = Column(String)             # Pipeline status enum	
+    preview_url = Column(String)             # Temporary sample site URL	
+    live_url    = Column(String)             # Production site URL	
+    domain      = Column(String)	
+    stripe_cid  = Column(String)             # Stripe customer ID	
+    plan        = Column(String)             # starter/premium/etc.	
+    paid_at     = Column(DateTime)	
+    created_at  = Column(DateTime, default=datetime.utcnow)	
+    notes       = Column(Text)	
+	
+class PipelineEvent(Base):	
+    __tablename__ = 'pipeline_events'	
+    id        = Column(UUID, primary_key=True)	
+    lead_id   = Column(UUID, ForeignKey('business_leads.id'))	
+    agent     = Column(String)   # Which agent triggered this	
+    event     = Column(String)   # Event type	
+    payload   = Column(JSONB)    # Full event data	
+    timestamp = Column(DateTime)	
+	
+class CallLog(Base):  OutboundCall(Base):  WhatsAppMessage(Base):  # etc.	
+---TABLE END---
+Status	Description	
+DISCOVERED	Business found by Discovery Agent	
+VERIFYING	Checking if website already exists	
+HAS_WEBSITE	Already has a site — excluded from pipeline	
+NO_WEBSITE	Confirmed no website — target for outreach	
+SAMPLE_BUILDING	Sample Builder Agent generating preview	
+SAMPLE_READY	Preview site deployed, ready for outreach	
+CALL_INITIATED	AI voice call placed	
+WHATSAPP_SENT	WhatsApp pitch message delivered	
+NEGOTIATING	Answering owner questions/objections	
+PAYMENT_LINK_SENT	Stripe payment link sent to owner	
+PAID	Payment confirmed — build phase begins	
+BUILDING	Production site being built	
+QA_IN_PROGRESS	Automated testing underway	
+LIVE	Site is live and publicly accessible	
+NOT_INTERESTED	Owner declined — goes to re-engage sequence later	
+CHURNED	Cancelled subscription	
+---TABLE END---
+PROMPT: discovery_category_expansion	
+SYSTEM: You are a business categorization expert.	
+USER: Given the business category '{category}', list 10 related search terms	
+       a person would use to find this type of business on Google Maps.	
+       Return as a JSON array of strings. Be specific to local search intent.	
+       Example: 'restaurant' → ['best restaurant near me', 'local diner', ...]	
+---TABLE END---
+PROMPT: sample_builder_content_generation	
+SYSTEM: You are an expert web copywriter specializing in local business websites.	
+        Generate professional, engaging website content for a {category} business.	
+        Always sound human, local, and authentic. Avoid generic phrases.	
+USER: Business Name: {name}	
+      Address: {address}	
+      Category: {category}	
+      Any extra info from Google: {google_data}	
+      Return ONLY valid JSON with these keys:	
+      {	
+        headline: string,        // Hero headline, max 8 words	
+        tagline: string,         // Subheadline, max 15 words	
+        about: string,           // 3-sentence about paragraph	
+        services: [{name, description, price_hint}],  // 4-6 services/products	
+        cta_text: string,        // Call-to-action button text	
+        color_scheme: {primary, secondary, accent},  // Hex colors	
+        seo_title: string,       // SEO-optimized page title	
+        meta_description: string // 155 char meta description	
+      }	
+---TABLE END---
+PROMPT: calling_agent_script	
+SYSTEM: You are writing a friendly, natural-sounding phone script for an AI voice agent.	
+        The agent calls local business owners to tell them about a free website we built.	
+        Keep it under 75 seconds spoken. Never sound robotic or salesy.	
+        Use natural pauses (written as '...'). Start with a greeting that sounds local.	
+USER: Business name: {name}	
+      Owner name (if known): {owner_name}	
+      Category: {category}	
+      Preview URL: {preview_url}	
+      Area: {area}	
+      Write a phone script. End by asking if they can check WhatsApp for the link.	
+      The script should handle: greeting, who we are, what we built for them,	
+      the preview link, price mention ($49/mo), and a WhatsApp CTA.	
+---TABLE END---
+PROMPT: negotiation_agent_response	
+SYSTEM: You are a helpful sales assistant for LocalWeb AI, a service that builds	
+        websites for local businesses. Your job is to answer questions, handle	
+        objections, and guide interested owners toward signing up.	
+        Be conversational, friendly, and honest. Never be pushy.	
+        Keep responses under 3 sentences unless a detailed answer is needed.	
+        Available context from FAQ: {faq_context}	
+        Business info: Name={name}, Category={category}	
+USER: Owner message: {owner_message}	
+      Conversation history: {history}	
+      Respond naturally. If they express interest in buying, tell them you'll	
+      send a payment link right away.	
+---TABLE END---
+PROMPT: qa_agent_review	
+SYSTEM: You are a senior web developer and UX expert reviewing a newly built	
+        local business website. Evaluate the site on: content quality,	
+        professionalism, accuracy, layout coherence, and business relevance.	
+        Be specific about any issues found.	
+USER: Business: {name} ({category}) in {area}	
+      Live URL: {url}	
+      Page HTML (first 3000 chars): {html_snippet}	
+      Lighthouse scores: Performance={perf}, SEO={seo}, Accessibility={a11y}	
+      Respond with JSON: { score: 1-10, issues: [string], approved: boolean,	
+      suggestions: [string] }	
+---TABLE END---
+Endpoint	Description	
+POST /api/discover	Trigger discovery for area + category	
+GET  /api/leads	List all leads with filters & pagination	
+GET  /api/leads/{id}	Get single lead with full pipeline history	
+POST /api/leads/{id}/call	Manually trigger AI call for a lead	
+POST /api/leads/{id}/whatsapp	Manually trigger WhatsApp outreach	
+GET  /api/pipeline/stats	Dashboard metrics (leads, conversions, MRR)	
+POST /webhooks/twilio/call-status	Twilio call status callback	
+POST /webhooks/twilio/recording	Twilio recording ready webhook	
+POST /webhooks/whatsapp/incoming	Incoming WhatsApp message handler	
+POST /webhooks/stripe/payment	Stripe payment success/failure events	
+GET  /api/sites/{domain}	Get deployed site info & analytics	
+POST /api/sites/{domain}/redeploy	Trigger site rebuild (on plan change)	
+GET  /api/templates	List all available website templates	
+POST /api/templates/preview	Generate instant preview for any business	
+---TABLE END---
+Tier	Price	Features	
+Starter	$49/mo + $99 setup	5-page site, contact form, mobile-ready, SSL, hosting	
+Business	$99/mo + $149 setup	All Starter + online booking, gallery, reviews widget	
+Premium	$199/mo + $249 setup	All Business + ecommerce, blog, WhatsApp chat widget	
+Enterprise	Custom	Multi-location, custom dev, dedicated support, SLA	
+---TABLE END---
+Metric	Estimate	
+Cost per lead discovered	$0.002 (Google Places API)	
+Cost per verification	$0.001 (DNS lookup + HTTP)	
+Cost per sample site build	$0.15 (GPT-4o tokens + Vercel preview)	
+Cost per AI call (60s)	$0.08 (Twilio + ElevenLabs + Whisper)	
+Cost per WhatsApp sequence	$0.03 (Meta API + LLM responses)	
+Cost per site deploy	$0.50 (Vercel + Cloudflare + storage)	
+Total cost per conversion (est.)	$2–5 including all agent costs	
+LTV at $49/mo with 18mo avg lifespan	$882 per customer	
+LTV:CAC ratio	~176:1 (extraordinary)	
+---TABLE END---
+docker-compose.yml — Full Local Stack	
+version: '3.9'	
+services:	
+  postgres:	
+    image: postgres:16	
+    environment: { POSTGRES_DB: localweb, POSTGRES_PASSWORD: secret }	
+    ports: ['5432:5432']	
+  redis:	
+    image: redis:7-alpine	
+    ports: ['6379:6379']	
+  api:	
+    build: .	
+    command: uvicorn api.main:app --reload --host 0.0.0.0 --port 8000	
+    environment:	
+      DATABASE_URL: postgresql+asyncpg://postgres:secret@postgres/localweb	
+      REDIS_URL: redis://redis:6379	
+      OPENAI_API_KEY: ${OPENAI_API_KEY}	
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}	
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}	
+      WHATSAPP_TOKEN: ${WHATSAPP_TOKEN}	
+      GOOGLE_PLACES_KEY: ${GOOGLE_PLACES_KEY}	
+    ports: ['8000:8000']	
+    depends_on: [postgres, redis]	
+  worker:	
+    build: .	
+    command: celery -A workers.main worker --loglevel=info	
+    depends_on: [redis, postgres]	
+  dashboard:	
+    build: ./dashboard	
+    ports: ['3000:3000']	
+---TABLE END---
+MASTER PROMPT: Use this to initialize the project with an AI coding agent	
+You are building 'LocalWeb AI' — a fully automated multi-agent SaaS platform	
+that finds local businesses without websites, reaches out via AI voice calls and	
+WhatsApp, builds them a sample website, and closes the sale automatically.	
+	
+TECH STACK:	
+  Backend: Python 3.12, FastAPI, LangGraph, Celery, PostgreSQL, Redis	
+  Frontend: Next.js 14, Tailwind CSS, shadcn/ui	
+  AI: OpenAI GPT-4o, ElevenLabs, Whisper, LangChain	
+  APIs: Twilio, Meta WhatsApp Cloud API, Stripe, Google Places, Vercel	
+	
+TASK: Set up the complete project structure including:	
+1. FastAPI application with async SQLAlchemy and Alembic migrations	
+2. Base agent class with Redis Streams pub/sub	
+3. Celery worker configuration for async task processing	
+4. All 12 agents (Discovery, Verification, SampleBuilder, Calling,	
+   WhatsApp, Negotiation, Payment, Builder, QA, SEO, CRM, Orchestrator)	
+5. Complete PostgreSQL schema with all tables and indexes	
+6. Webhook handlers for Twilio, WhatsApp, and Stripe	
+7. Next.js dashboard with real-time pipeline monitoring	
+8. Docker Compose for local development	
+9. Environment variable configuration with validation	
+10. Comprehensive error handling and retry logic for all agents	
+	
+Start with the project structure, base classes, and database models.	
+Write production-quality, well-commented code.	
+After each file, explain what it does and what needs to be configured.	
+---TABLE END---
+PROMPT: Build Discovery Agent	
+Build the DiscoveryAgent for LocalWeb AI in Python.	
+It must: (1) Accept area (city/district) and category (restaurant/salon/etc.)	
+(2) Query Google Places API textsearch endpoint with pagination	
+(3) Also query Yelp Fusion API as a backup source	
+(4) Deduplicate results by phone number and place_id	
+(5) Save each lead to PostgreSQL via SQLAlchemy async session	
+(6) Emit each lead to Redis Stream 'stream:verify' for the next agent	
+(7) Handle rate limiting with exponential backoff	
+(8) Return a summary dict with counts	
+Include full error handling, logging, and type hints.	
+---TABLE END---
+PROMPT: Build Calling Agent with Twilio + ElevenLabs	
+Build the CallingAgent for LocalWeb AI.	
+Requirements:	
+(1) Generate a personalized 60-second call script using GPT-4o	
+(2) Convert script to audio using ElevenLabs API (voice: 'Adam' or similar)	
+(3) Host audio file on AWS S3 with public URL	
+(4) Place outbound call via Twilio using TwiML <Play> + <Record>	
+(5) Implement Twilio webhook handler at POST /webhooks/twilio/recording	
+(6) Transcribe owner's response using OpenAI Whisper	
+(7) Extract intent from transcription (interested/not_interested/needs_info)	
+(8) Route to appropriate next agent based on intent	
+(9) Log all call data including duration, transcript, sentiment to DB	
+Handle all Twilio error codes gracefully. Add retry for failed calls (max 2 retries).	
+---TABLE END---
+PROMPT: AI Code Reviewer (run after each agent is built)	
+You are a senior Python engineer and security expert conducting a code review.	
+Review the following code for LocalWeb AI agent:	
+	
+[PASTE CODE HERE]	
+	
+Check for:	
+1. Security vulnerabilities (SQL injection, API key exposure, SSRF, etc.)	
+2. Async correctness — proper use of await, no blocking calls in async context	
+3. Error handling — all external API calls wrapped in try/except with proper logging	
+4. Data validation — all inputs validated before processing	
+5. Rate limiting — does it respect API rate limits with backoff?	
+6. Idempotency — can this agent run twice without causing duplicate actions?	
+7. Scalability — will this work under 10x load? Are there bottlenecks?	
+8. Code quality — PEP8, type hints, docstrings, clear naming	
+	
+Respond with: APPROVED / NEEDS_CHANGES, then a bulleted list of findings.	
+For each finding, classify as: CRITICAL / WARNING / SUGGESTION	
+---TABLE END---
+Phase	Timeline	Deliverables	
+Phase 1: Foundation	Weeks 1-3	DB schema, base agents, FastAPI setup, Docker environment, admin dashboard skeleton	
+Phase 2: Discovery	Weeks 4-5	Discovery + Verification agents live, lead pipeline visible in dashboard	
+Phase 3: Outreach	Weeks 6-8	Sample Builder, WhatsApp Agent, Calling Agent, Negotiation Agent integrated	
+Phase 4: Monetization	Weeks 9-10	Payment Agent (Stripe), Builder Agent (Vercel), QA Agent live	
+Phase 5: Growth	Weeks 11-12	SEO Agent, CRM Agent, upsell sequences, analytics dashboard	
+Phase 6: Scale	Months 4-6	Kubernetes deployment, multi-region, 10+ business categories, referral program	
+Phase 7: Expansion	Months 7-12	White-label offering, franchise targeting, API for third-party resellers	
+---TABLE END---
+Key Success Metrics to Track from Day 1	
+Lead-to-contact rate: % of discovered businesses that can be reached (target: >70%)	
+Contact-to-interested rate: % who express interest after outreach (target: >15%)	
+Interested-to-paid conversion rate: % who complete payment (target: >40%)	
+Overall discovery-to-paid rate: (target: >5% within 30 days of discovery)	
+MRR growth rate: (target: 20% month-over-month in first 6 months)	
+Churn rate: (target: <3% monthly — if higher, improve site quality + support)	
+NPS score: Survey clients at 30/90/180 days (target: >50)	
+---TABLE END---
+scripts/cli/setup_wizard.py  —  First-Time Setup	
+# Run once on a fresh server / VM	
+python scripts/cli/setup_wizard.py	
+	
+# What the wizard does step-by-step:	
+#  Step 1  — Check Python 3.12+, Docker, docker-compose, Node 20	
+#  Step 2  — Prompt for all API keys (see 13.2 for the full key list)	
+#  Step 3  — Write .env file and push secrets to Vault or AWS Secrets Manager	
+#  Step 4  — Pull Docker images and start postgres + redis	
+#  Step 5  — Run alembic upgrade head  (creates all DB tables)	
+#  Step 6  — Seed pricing plans in Stripe and DB	
+#  Step 7  — Run smoke tests (ping API, check DB, check Redis)	
+#  Step 8  — Print summary dashboard with all service URLs	
+	
+# Flags	
+python scripts/cli/setup_wizard.py --env production   # skip dev defaults	
+python scripts/cli/setup_wizard.py --skip-docker      # existing infra	
+python scripts/cli/setup_wizard.py --dry-run          # validate without writing	
+---TABLE END---
+scripts/cli/key_manager.py  —  API Key Management	
+# ── List all configured keys and their status ──────────────────	
+python scripts/cli/key_manager.py list	
+	
+# ── Set / update a key ─────────────────────────────────────────	
+python scripts/cli/key_manager.py set OPENAI_API_KEY	
+python scripts/cli/key_manager.py set TWILIO_ACCOUNT_SID	
+python scripts/cli/key_manager.py set TWILIO_AUTH_TOKEN	
+python scripts/cli/key_manager.py set TWILIO_PHONE_NUMBER          # +1XXXXXXXXXX	
+python scripts/cli/key_manager.py set ELEVENLABS_API_KEY	
+python scripts/cli/key_manager.py set ELEVENLABS_VOICE_ID	
+python scripts/cli/key_manager.py set WHATSAPP_ACCESS_TOKEN        # Meta Cloud API	
+python scripts/cli/key_manager.py set WHATSAPP_PHONE_NUMBER_ID	
+python scripts/cli/key_manager.py set WHATSAPP_VERIFY_TOKEN        # Webhook verify	
+python scripts/cli/key_manager.py set GOOGLE_PLACES_API_KEY	
+python scripts/cli/key_manager.py set SERPAPI_API_KEY	
+python scripts/cli/key_manager.py set STRIPE_SECRET_KEY	
+python scripts/cli/key_manager.py set STRIPE_WEBHOOK_SECRET	
+python scripts/cli/key_manager.py set STRIPE_PRICE_STARTER_MONTHLY	
+python scripts/cli/key_manager.py set STRIPE_PRICE_SETUP_FEE	
+python scripts/cli/key_manager.py set VERCEL_TOKEN	
+python scripts/cli/key_manager.py set CLOUDFLARE_API_TOKEN	
+python scripts/cli/key_manager.py set CLOUDFLARE_ZONE_ID	
+python scripts/cli/key_manager.py set AWS_ACCESS_KEY_ID	
+python scripts/cli/key_manager.py set AWS_SECRET_ACCESS_KEY	
+python scripts/cli/key_manager.py set AWS_S3_BUCKET	
+python scripts/cli/key_manager.py set SENDGRID_API_KEY	
+python scripts/cli/key_manager.py set HUBSPOT_API_KEY	
+python scripts/cli/key_manager.py set PINECONE_API_KEY	
+python scripts/cli/key_manager.py set PINECONE_ENVIRONMENT	
+python scripts/cli/key_manager.py set ANTHROPIC_API_KEY            # Claude 3.5 QA	
+	
+# ── Validate all keys (live API calls) ─────────────────────────	
+python scripts/cli/key_manager.py validate --all	
+python scripts/cli/key_manager.py validate STRIPE_SECRET_KEY      # single key	
+	
+# ── Rotate a key (sets new value + re-deploys env) ─────────────	
+python scripts/cli/key_manager.py rotate OPENAI_API_KEY	
+	
+# ── Export current config to .env (for local dev only) ─────────	
+python scripts/cli/key_manager.py export --file .env	
+	
+# ── Backend targets ────────────────────────────────────────────	
+python scripts/cli/key_manager.py set KEY --backend vault	
+python scripts/cli/key_manager.py set KEY --backend aws-secrets	
+python scripts/cli/key_manager.py set KEY --backend dotenv        # dev only	
+---TABLE END---
+Environment Variable	Purpose / Where to obtain	
+OPENAI_API_KEY	GPT-4o for all content generation — platform.openai.com	
+ANTHROPIC_API_KEY	Claude 3.5 Sonnet for QA agent — console.anthropic.com	
+ELEVENLABS_API_KEY	TTS voice for calling agent — elevenlabs.io	
+ELEVENLABS_VOICE_ID	Voice profile ID from ElevenLabs dashboard	
+TWILIO_ACCOUNT_SID	Twilio voice calls — twilio.com/console	
+TWILIO_AUTH_TOKEN	Twilio auth — twilio.com/console	
+TWILIO_PHONE_NUMBER	Purchased Twilio number in E.164 format	
+WHATSAPP_ACCESS_TOKEN	Meta Cloud API permanent token	
+WHATSAPP_PHONE_NUMBER_ID	WhatsApp Business phone number ID	
+WHATSAPP_VERIFY_TOKEN	Self-generated string for webhook verification	
+GOOGLE_PLACES_API_KEY	Google Maps Platform — console.cloud.google.com	
+SERPAPI_API_KEY	Backup discovery scraping — serpapi.com	
+STRIPE_SECRET_KEY	Payment processing — dashboard.stripe.com	
+STRIPE_WEBHOOK_SECRET	From Stripe CLI: stripe listen --print-secret	
+STRIPE_PRICE_STARTER_MONTHLY	Stripe Price ID for $49/mo plan	
+STRIPE_PRICE_SETUP_FEE	Stripe Price ID for one-time setup fee	
+VERCEL_TOKEN	Site deployment — vercel.com/account/tokens	
+CLOUDFLARE_API_TOKEN	DNS management — dash.cloudflare.com	
+CLOUDFLARE_ZONE_ID	Zone for localweb.ai domain	
+AWS_ACCESS_KEY_ID	S3 for audio/screenshots — IAM console	
+AWS_SECRET_ACCESS_KEY	AWS IAM secret	
+AWS_S3_BUCKET	Bucket name for media assets	
+SENDGRID_API_KEY	Transactional email — app.sendgrid.com	
+HUBSPOT_API_KEY	CRM pipeline — app.hubspot.com	
+PINECONE_API_KEY	Vector DB for RAG — app.pinecone.io	
+PINECONE_ENVIRONMENT	Pinecone region/environment string	
+DATABASE_URL	PostgreSQL connection string (auto-set by wizard)	
+REDIS_URL	Redis connection string (auto-set by wizard)	
+JWT_SECRET	Random 64-byte hex — auto-generated by wizard	
+ENCRYPTION_KEY	AES-256 key for PII — auto-generated by wizard	
+---TABLE END---
+scripts/cli/health_check.py  —  Service Status	
+# ── Full system health check ───────────────────────────────────	
+python scripts/cli/health_check.py	
+	
+# ── Check individual services ──────────────────────────────────	
+python scripts/cli/health_check.py --service api	
+python scripts/cli/health_check.py --service postgres	
+python scripts/cli/health_check.py --service redis	
+python scripts/cli/health_check.py --service celery	
+python scripts/cli/health_check.py --service kafka	
+	
+# ── Check external API integrations ────────────────────────────	
+python scripts/cli/health_check.py --external openai	
+python scripts/cli/health_check.py --external twilio	
+python scripts/cli/health_check.py --external stripe	
+python scripts/cli/health_check.py --external whatsapp	
+python scripts/cli/health_check.py --external vercel	
+	
+# ── Agent worker status (running / idle / error / stopped) ─────	
+python scripts/cli/health_check.py --agents	
+	
+# ── Continuous monitor (refreshes every 10s) ───────────────────	
+python scripts/cli/health_check.py --watch	
+python scripts/cli/health_check.py --watch --interval 30	
+	
+# ── Output as JSON for Datadog / Grafana ingestion ─────────────	
+python scripts/cli/health_check.py --format json	
+---TABLE END---
+scripts/cli/db_manager.py  —  Database Operations	
+# ── Migrations ─────────────────────────────────────────────────	
+python scripts/cli/db_manager.py migrate                 # run pending alembic migrations	
+python scripts/cli/db_manager.py migrate --revision head # same as above	
+python scripts/cli/db_manager.py rollback --steps 1      # undo last migration	
+python scripts/cli/db_manager.py history                 # show migration history	
+	
+# ── Snapshots & Backups ─────────────────────────────────────────	
+python scripts/cli/db_manager.py snapshot                # pg_dump to S3 + timestamp	
+python scripts/cli/db_manager.py snapshot --local        # dump to ./backups/	
+python scripts/cli/db_manager.py list-snapshots          # list all snapshots on S3	
+python scripts/cli/db_manager.py restore --snapshot 2025-03-01T14:00:00	
+	
+# ── Lead & Pipeline Data ────────────────────────────────────────	
+python scripts/cli/db_manager.py stats                   # lead counts by status	
+python scripts/cli/db_manager.py audit --lead <uuid>     # full history for one lead	
+python scripts/cli/db_manager.py purge --status HAS_WEBSITE --older-than 90d	
+python scripts/cli/db_manager.py purge --status NOT_INTERESTED --older-than 180d	
+	
+# ── Maintenance ─────────────────────────────────────────────────	
+python scripts/cli/db_manager.py vacuum                  # VACUUM ANALYZE all tables	
+python scripts/cli/db_manager.py reindex                 # REINDEX all indexes	
+python scripts/cli/db_manager.py size                    # table sizes and row counts	
+	
+# ── Connection pool status ──────────────────────────────────────	
+python scripts/cli/db_manager.py pool-status             # active / idle connections	
+---TABLE END---
+scripts/cli/agent_control.py  —  Agent Runtime Management	
+# ── List all agents and their state ────────────────────────────	
+python scripts/cli/agent_control.py list	
+	
+# ── Start / stop / restart a specific agent ─────────────────────	
+python scripts/cli/agent_control.py start  discovery	
+python scripts/cli/agent_control.py stop   calling	
+python scripts/cli/agent_control.py restart whatsapp	
+python scripts/cli/agent_control.py stop   --all          # emergency stop	
+	
+# ── Pause agent (drain current tasks, accept no new ones) ───────	
+python scripts/cli/agent_control.py pause  negotiation	
+python scripts/cli/agent_control.py resume negotiation	
+	
+# ── Scale Celery concurrency per agent ──────────────────────────	
+python scripts/cli/agent_control.py scale discovery   --concurrency 5	
+python scripts/cli/agent_control.py scale calling     --concurrency 10	
+python scripts/cli/agent_control.py scale whatsapp    --concurrency 20	
+	
+# ── Set per-agent rate limits (overrides defaults) ──────────────	
+python scripts/cli/agent_control.py rate-limit discovery  --per-minute 30	
+python scripts/cli/agent_control.py rate-limit calling    --per-hour 50	
+python scripts/cli/agent_control.py rate-limit whatsapp   --per-hour 200	
+	
+# ── Manually trigger an agent for a specific lead ────────────────	
+python scripts/cli/agent_control.py trigger calling   --lead-id <uuid>	
+python scripts/cli/agent_control.py trigger whatsapp  --lead-id <uuid>	
+python scripts/cli/agent_control.py trigger builder   --lead-id <uuid>	
+	
+# ── View agent queue depth ──────────────────────────────────────	
+python scripts/cli/agent_control.py queue-depth	
+python scripts/cli/agent_control.py queue-depth --agent calling	
+	
+# ── Flush / purge a specific agent's queue ──────────────────────	
+python scripts/cli/agent_control.py flush calling     # clear pending call tasks	
+---TABLE END---
+scripts/cli/log_manager.py  —  Log Operations	
+# ── Tail live logs (all agents) ────────────────────────────────	
+python scripts/cli/log_manager.py tail	
+python scripts/cli/log_manager.py tail --agent calling	
+python scripts/cli/log_manager.py tail --level ERROR	
+	
+# ── Search logs ─────────────────────────────────────────────────	
+python scripts/cli/log_manager.py search --lead-id <uuid>	
+python scripts/cli/log_manager.py search --query 'stripe payment failed'	
+python scripts/cli/log_manager.py search --since '2025-03-01 00:00' --until '2025-03-02 00:00'	
+	
+# ── Error summary (last 24h, grouped by agent) ──────────────────	
+python scripts/cli/log_manager.py errors	
+python scripts/cli/log_manager.py errors --hours 6	
+	
+# ── Export logs to file ─────────────────────────────────────────	
+python scripts/cli/log_manager.py export --agent whatsapp --date 2025-03-01 --out whatsapp.log	
+	
+# ── Set log level at runtime (no restart needed) ─────────────────	
+python scripts/cli/log_manager.py set-level --agent discovery DEBUG	
+python scripts/cli/log_manager.py set-level --all WARNING	
+	
+# ── Rotate log files and compress archives ───────────────────────	
+python scripts/cli/log_manager.py rotate	
+python scripts/cli/log_manager.py prune --older-than 30d   # delete old archives	
+---TABLE END---
+scripts/cli/dnc_manager.py  —  Do-Not-Contact List	
+# ── View DNC list ───────────────────────────────────────────────	
+python scripts/cli/dnc_manager.py list	
+python scripts/cli/dnc_manager.py list --format csv > dnc_export.csv	
+	
+# ── Add a number to DNC ──────────────────────────────────────────	
+python scripts/cli/dnc_manager.py add +14155552671	
+python scripts/cli/dnc_manager.py add +14155552671 --reason 'Owner requested via email'	
+	
+# ── Bulk import from CSV or text file ────────────────────────────	
+python scripts/cli/dnc_manager.py import --file dnc_list.csv	
+python scripts/cli/dnc_manager.py import --file numbers.txt      # one number per line	
+	
+# ── Remove a number (should be rare — for erroneous additions) ───	
+python scripts/cli/dnc_manager.py remove +14155552671 --reason 'Added in error'	
+	
+# ── Check if a number is on the list ────────────────────────────	
+python scripts/cli/dnc_manager.py check +14155552671	
+	
+# ── Sync Redis from PostgreSQL (use after Redis flush/restart) ───	
+python scripts/cli/dnc_manager.py sync	
+	
+# ── Statistics ──────────────────────────────────────────────────	
+python scripts/cli/dnc_manager.py stats	
+---TABLE END---
+scripts/cli/rotate_secrets.py  —  Secrets Rotation	
+# ── Rotate a single key ─────────────────────────────────────────	
+python scripts/cli/rotate_secrets.py --key OPENAI_API_KEY	
+	
+# ── Rotate all keys due for rotation (> 90 days old) ────────────	
+python scripts/cli/rotate_secrets.py --auto	
+	
+# ── Emergency rotation (rotate everything immediately) ───────────	
+python scripts/cli/rotate_secrets.py --emergency	
+	
+# ── View rotation history and next-due dates ─────────────────────	
+python scripts/cli/rotate_secrets.py --audit	
+	
+# ── Rotate the JWT signing secret (invalidates all active sessions)	
+python scripts/cli/rotate_secrets.py --key JWT_SECRET --notify-admins	
+	
+# ── Rotate DB passwords and update connection strings ────────────	
+python scripts/cli/rotate_secrets.py --key DATABASE_URL --restart-api	
+	
+# ── Generate new AES-256 encryption key and re-encrypt PII data ──	
+python scripts/cli/rotate_secrets.py --key ENCRYPTION_KEY --reencrypt-pii	
+---TABLE END---
+scripts/cli/env_config.py  —  Runtime Configuration	
+# ── View all config values ──────────────────────────────────────	
+python scripts/cli/env_config.py list	
+python scripts/cli/env_config.py list --section calling	
+	
+# ── Set a config value ───────────────────────────────────────────	
+python scripts/cli/env_config.py set CALLING_ENABLED false        # disable all calls	
+python scripts/cli/env_config.py set WHATSAPP_ENABLED true	
+python scripts/cli/env_config.py set DISCOVERY_MAX_LEADS_PER_RUN 100	
+python scripts/cli/env_config.py set CALL_WINDOW_START_HOUR 9     # 9 AM local time	
+python scripts/cli/env_config.py set CALL_WINDOW_END_HOUR 20      # 8 PM local time	
+python scripts/cli/env_config.py set OUTREACH_COOLDOWN_DAYS 7     # re-contact cooldown	
+python scripts/cli/env_config.py set MAX_CALLS_PER_LEAD 2         # retry limit	
+python scripts/cli/env_config.py set WHATSAPP_MSGS_PER_HOUR 200	
+python scripts/cli/env_config.py set SAMPLE_BUILDER_GPT_MODEL gpt-4o	
+python scripts/cli/env_config.py set QA_PERF_THRESHOLD 0.8	
+python scripts/cli/env_config.py set QA_SEO_THRESHOLD 0.8	
+python scripts/cli/env_config.py set QA_LLM_SCORE_MIN 8	
+	
+# ── Feature flags ────────────────────────────────────────────────	
+python scripts/cli/env_config.py feature enable  auto_discovery	
+python scripts/cli/env_config.py feature disable auto_calling	
+python scripts/cli/env_config.py feature enable  seo_agent	
+python scripts/cli/env_config.py feature disable crm_sync	
+	
+# ── Reset a value to its default ────────────────────────────────	
+python scripts/cli/env_config.py reset CALL_WINDOW_START_HOUR	
+python scripts/cli/env_config.py reset --all	
+	
+# ── Show diff vs defaults ────────────────────────────────────────	
+python scripts/cli/env_config.py diff	
+---TABLE END---
+scripts/cli/admin_users.py  —  User & Access Management	
+# ── List all admin users ────────────────────────────────────────	
+python scripts/cli/admin_users.py list	
+	
+# ── Create a new admin user ─────────────────────────────────────	
+python scripts/cli/admin_users.py create --email admin@company.com --role super_admin	
+python scripts/cli/admin_users.py create --email ops@company.com   --role ops_manager	
+python scripts/cli/admin_users.py create --email viewer@company.com --role viewer	
+	
+# ── Change a user's role ─────────────────────────────────────────	
+python scripts/cli/admin_users.py set-role --email ops@company.com --role super_admin	
+	
+# ── Reset a user's password (sends email with reset link) ────────	
+python scripts/cli/admin_users.py reset-password --email ops@company.com	
+	
+# ── Deactivate / reactivate a user ───────────────────────────────	
+python scripts/cli/admin_users.py deactivate --email leaver@company.com	
+python scripts/cli/admin_users.py reactivate --email returner@company.com	
+	
+# ── View login audit trail for a user ────────────────────────────	
+python scripts/cli/admin_users.py audit --email admin@company.com	
+	
+# ── Enable / disable 2FA requirement for all admins ──────────────	
+python scripts/cli/admin_users.py enforce-2fa --enable	
+	
+# ── Generate API token for CI/CD or external integrations ────────	
+python scripts/cli/admin_users.py generate-token --email ci@company.com --ttl 365d	
+python scripts/cli/admin_users.py revoke-token   --email ci@company.com	
+---TABLE END---
+scripts/cli/deploy.py  —  Deployment & Rollback	
+# ── Deploy latest code (pull + migrate + restart) ───────────────	
+python scripts/cli/deploy.py update	
+python scripts/cli/deploy.py update --skip-migrations	
+python scripts/cli/deploy.py update --service api          # single service	
+python scripts/cli/deploy.py update --service worker	
+	
+# ── Rolling deploy with health checks between steps ─────────────	
+python scripts/cli/deploy.py rolling --services api,worker,dashboard	
+	
+# ── Canary deploy (10% traffic to new version) ───────────────────	
+python scripts/cli/deploy.py canary --version v2.1.0 --weight 10	
+python scripts/cli/deploy.py canary --promote               # 100% to new version	
+python scripts/cli/deploy.py canary --abort                 # revert canary	
+	
+# ── View deployment history ──────────────────────────────────────	
+python scripts/cli/deploy.py history	
+python scripts/cli/deploy.py history --limit 10	
+	
+# ── Rollback to previous version ─────────────────────────────────	
+python scripts/cli/deploy.py rollback                       # one step back	
+python scripts/cli/deploy.py rollback --version v2.0.5      # specific version	
+python scripts/cli/deploy.py rollback --steps 3             # three versions back	
+	
+# ── Maintenance mode (shows maintenance page to dashboard users) ──	
+python scripts/cli/deploy.py maintenance --enable	
+python scripts/cli/deploy.py maintenance --disable	
+	
+# ── Emergency full stack restart ─────────────────────────────────	
+python scripts/cli/deploy.py restart --all	
+---TABLE END---
+scripts/cli/diagnostics.py  —  System Diagnostics	
+# ── Full system snapshot (saves to ./diagnostics/<timestamp>/) ───	
+python scripts/cli/diagnostics.py snapshot	
+	
+# ── Check slow DB queries (last 1h) ──────────────────────────────	
+python scripts/cli/diagnostics.py slow-queries	
+python scripts/cli/diagnostics.py slow-queries --threshold 500ms	
+	
+# ── Redis memory and key stats ───────────────────────────────────	
+python scripts/cli/diagnostics.py redis-info	
+	
+# ── Celery task throughput and failure rates ─────────────────────	
+python scripts/cli/diagnostics.py celery-stats	
+	
+# ── API endpoint latency report ──────────────────────────────────	
+python scripts/cli/diagnostics.py api-latency --top 20	
+	
+# ── External API cost estimation (last 30 days) ──────────────────	
+python scripts/cli/diagnostics.py api-costs	
+	
+# ── Pipeline funnel report (discovery → paid conversions) ────────	
+python scripts/cli/diagnostics.py funnel --days 30	
+	
+# ── Identify stalled leads (stuck in same status > 24h) ──────────	
+python scripts/cli/diagnostics.py stalled-leads	
+python scripts/cli/diagnostics.py stalled-leads --status CALL_INITIATED --hours 48	
+	
+# ── Generate incident report bundle (zip for support) ────────────	
+python scripts/cli/diagnostics.py incident-report --since '2025-03-01 14:00'	
+---TABLE END---
+scripts/cli/billing_manager.py  —  Stripe & Billing	
+# ── Seed Stripe products and prices on a new deployment ──────────	
+python scripts/cli/billing_manager.py seed-plans	
+	
+# ── List all active subscriptions ───────────────────────────────	
+python scripts/cli/billing_manager.py list-subs	
+python scripts/cli/billing_manager.py list-subs --status past_due	
+	
+# ── Cancel a subscription ────────────────────────────────────────	
+python scripts/cli/billing_manager.py cancel-sub --customer-id cus_XXXX	
+python scripts/cli/billing_manager.py cancel-sub --lead-id <uuid>	
+	
+# ── Issue a refund ────────────────────────────────────────────────	
+python scripts/cli/billing_manager.py refund --payment-intent pi_XXXX	
+	
+# ── Sync Stripe data to local DB (reconcile) ─────────────────────	
+python scripts/cli/billing_manager.py sync	
+	
+# ── Register / test Stripe webhooks ──────────────────────────────	
+python scripts/cli/billing_manager.py register-webhook --url https://api.localweb.ai/webhooks/stripe/payment	
+python scripts/cli/billing_manager.py test-webhook --event checkout.session.completed	
+	
+# ── MRR and revenue report ────────────────────────────────────────	
+python scripts/cli/billing_manager.py revenue --month 2025-03	
+---TABLE END---
+scripts/cli/site_manager.py  —  Client Site Operations	
+# ── List all live client sites ──────────────────────────────────	
+python scripts/cli/site_manager.py list	
+python scripts/cli/site_manager.py list --status building	
+	
+# ── Trigger a site redeploy ──────────────────────────────────────	
+python scripts/cli/site_manager.py redeploy --domain joes-pizza.com	
+python scripts/cli/site_manager.py redeploy --lead-id <uuid>	
+	
+# ── Check site health (SSL, DNS, Lighthouse score) ───────────────	
+python scripts/cli/site_manager.py check --domain joes-pizza.com	
+	
+# ── Change / transfer a custom domain ────────────────────────────	
+python scripts/cli/site_manager.py set-domain --lead-id <uuid> --domain new-domain.com	
+	
+# ── Bulk redeploy all sites on a template (after template update) -	
+python scripts/cli/site_manager.py bulk-redeploy --template restaurant	
+	
+# ── Purge Cloudflare CDN cache for a site ────────────────────────	
+python scripts/cli/site_manager.py purge-cache --domain joes-pizza.com	
+	
+# ── Take a site offline / put back online ────────────────────────	
+python scripts/cli/site_manager.py suspend --domain joes-pizza.com    # e.g. non-payment	
+python scripts/cli/site_manager.py unsuspend --domain joes-pizza.com	
+	
+# ── Export site config for migration ────────────────────────────	
+python scripts/cli/site_manager.py export --domain joes-pizza.com --out site_backup.zip	
+---TABLE END---
+Task	Command	
+First-time setup	python scripts/cli/setup_wizard.py	
+Set an API key	python scripts/cli/key_manager.py set <KEY_NAME>	
+Validate all API keys	python scripts/cli/key_manager.py validate --all	
+Full health check	python scripts/cli/health_check.py	
+Watch live health	python scripts/cli/health_check.py --watch	
+Run DB migrations	python scripts/cli/db_manager.py migrate	
+Backup database	python scripts/cli/db_manager.py snapshot	
+Stop all agents (emergency)	python scripts/cli/agent_control.py stop --all	
+Restart a specific agent	python scripts/cli/agent_control.py restart <agent>	
+Tail error logs	python scripts/cli/log_manager.py tail --level ERROR	
+Add number to DNC	python scripts/cli/dnc_manager.py add +1XXXXXXXXXX	
+Disable calling feature	python scripts/cli/env_config.py set CALLING_ENABLED false	
+Deploy latest code	python scripts/cli/deploy.py update	
+Rollback one version	python scripts/cli/deploy.py rollback	
+Full system diagnostics	python scripts/cli/diagnostics.py snapshot	
+Find stalled leads	python scripts/cli/diagnostics.py stalled-leads	
+Rotate all secrets	python scripts/cli/rotate_secrets.py --emergency	
+Create admin user	python scripts/cli/admin_users.py create --email x --role ops_manager	
+Suspend client site	python scripts/cli/site_manager.py suspend --domain x.com	
+Seed Stripe plans	python scripts/cli/billing_manager.py seed-plans	
+---TABLE END---
